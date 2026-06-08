@@ -9,6 +9,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Mustadz0/stripe-qbo-converter/pulls)
 [![Maintained](https://img.shields.io/badge/Maintained%3F-yes-blue.svg)](https://github.com/Mustadz0/stripe-qbo-converter)
+[![Donate](https://img.shields.io/badge/Donate-TRON-darkgreen?logo=tron&logoColor=white)](https://github.com/Mustadz0/stripe-qbo-converter#donate)
 
 ---
 
@@ -327,6 +328,36 @@ python cli.py dosyan.csv -f bank -o qbo_hazir.csv
 | `sales_receipt` | Müşteri bazında satışlar |
 | `journal` | Çift taraflı muhasebe kaydı |
 | `combined` | Banka + ücretler tek dosyada |
+
+---
+
+---
+
+<a name="donate"></a>
+## 💛 Support / دعم التطوير / Soutenir / Apoyar / Unterstützen / Destek
+
+If this tool saved you time, consider supporting its development:
+
+> **TRON (TRC20):** `TSQt2sV6NypuXFK3mqtPCgzHeoXug6pQp4`
+
+<div align="center">
+
+```
+TSQt2sV6NypuXFK3mqtPCgzHeoXug6pQp4
+```
+
+</div>
+
+---
+
+| | | |
+|---|---|---|
+| 🇬🇧 | **Support Development** | Every donation helps keep this tool free and updated. Thank you! |
+| 🇸🇦 | **ادعم التطوير** | كل تبرع يساعد في إبقاء هذه الأداة مجانية ومطورة. شكرًا لك! |
+| 🇫🇷 | **Soutenir le développement** | Chaque don aide à maintenir cet outil gratuit et à jour. Merci ! |
+| 🇪🇸 | **Apoyar el desarrollo** | Cada donación ayuda a mantener esta herramienta gratuita. ¡Gracias! |
+| 🇩🇪 | **Entwicklung unterstützen** | Jede Spende hilft, dieses Tool kostenlos zu halten. Danke! |
+| 🇹🇷 | **Geliştirmeyi destekle** | Her bağış bu aracı ücretsiz tutmaya yardımcı olur. Teşekkürler! |
 
 ---
 
