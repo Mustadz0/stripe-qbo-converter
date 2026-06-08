@@ -11,6 +11,7 @@
 [![Maintained](https://img.shields.io/badge/Maintained%3F-yes-blue.svg)](https://github.com/Mustadz0/stripe-qbo-converter)
 [![Donate](https://img.shields.io/badge/Donate-TRON-darkgreen?logo=tron&logoColor=white)](https://github.com/Mustadz0/stripe-qbo-converter#donate)
 [![CI](https://github.com/Mustadz0/stripe-qbo-converter/actions/workflows/ci.yml/badge.svg)](https://github.com/Mustadz0/stripe-qbo-converter/actions)
+[![Deploy to Render](https://img.shields.io/badge/Deploy%20to%20Render-46E3B7?logo=render&logoColor=white)](https://render.com/deploy?repo=https://github.com/Mustadz0/stripe-qbo-converter)
 
 ---
 
