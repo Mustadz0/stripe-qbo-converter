@@ -10,6 +10,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Mustadz0/stripe-qbo-converter/pulls)
 [![Maintained](https://img.shields.io/badge/Maintained%3F-yes-blue.svg)](https://github.com/Mustadz0/stripe-qbo-converter)
 [![Donate](https://img.shields.io/badge/Donate-TRON-darkgreen?logo=tron&logoColor=white)](https://github.com/Mustadz0/stripe-qbo-converter#donate)
+[![CI](https://github.com/Mustadz0/stripe-qbo-converter/actions/workflows/ci.yml/badge.svg)](https://github.com/Mustadz0/stripe-qbo-converter/actions)
 
 ---
 
