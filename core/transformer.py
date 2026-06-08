@@ -37,12 +37,12 @@ class QBOTransformer:
         return raw[:10]
 
     def to_bank_transactions(self) -> str:
-        """Output: Date, Description, Amount, Memo"""
+        """Output: Date, Description, Amount, Memo, Currency"""
         out = StringIO()
         w = csv.writer(out)
-        w.writerow(["Date", "Description", "Amount", "Memo"])
+        w.writerow(["Date", "Description", "Amount", "Memo", "Currency"])
         for tx in self._iter_bank_entries():
-            w.writerow([tx["Date"], tx["Description"], tx["Amount"], tx["Memo"]])
+            w.writerow([tx["Date"], tx["Description"], tx["Amount"], tx["Memo"], tx.get("Currency", "USD")])
         return out.getvalue()
 
     def to_sales_receipts(self) -> str:
@@ -57,11 +57,13 @@ class QBOTransformer:
                 "Item Amount",
                 "Item Description",
                 "Memo",
+                "Currency",
             ]
         )
         for tx in self.transactions:
             d = self._fmt_date(tx.date)
             if tx.tx_type == StripeTxType.CHARGE:
+                cur = tx.currency.upper() if tx.currency else "USD"
                 w.writerow([
                     d,
                     tx.customer_email or tx.customer_name or "Stripe Customer",
@@ -69,6 +71,7 @@ class QBOTransformer:
                     tx.gross_amount,
                     tx.description[:100] if tx.description else "",
                     f"Stripe charge: {tx.stripe_id or ''}",
+                    cur,
                 ])
                 w.writerow([
                     d,
@@ -77,6 +80,7 @@ class QBOTransformer:
                     tx.fee,
                     "Payment processing fee",
                     f"Stripe fee: {tx.stripe_id or ''}",
+                    cur,
                 ])
         return out.getvalue()
 
@@ -84,40 +88,43 @@ class QBOTransformer:
         """Output journal entries for importing to QBO"""
         out = StringIO()
         w = csv.writer(out)
-        w.writerow(["Date", "Account", "Debit", "Credit", "Memo", "Name"])
+        w.writerow(["Date", "Account", "Debit", "Credit", "Memo", "Name", "Currency"])
         for tx in self.transactions:
             d = self._fmt_date(tx.date)
+            cur = tx.currency.upper() if tx.currency else "USD"
             if tx.tx_type == StripeTxType.CHARGE:
-                w.writerow([d, "Stripe Clearing", tx.gross_amount, "0", tx.description[:100], tx.customer_email or ""])
-                w.writerow([d, "Sales Income", "0", tx.gross_amount, tx.description[:100], tx.customer_email or ""])
+                w.writerow([d, "Stripe Clearing", tx.gross_amount, "0", tx.description[:100], tx.customer_email or "", cur])
+                w.writerow([d, "Sales Income", "0", tx.gross_amount, tx.description[:100], tx.customer_email or "", cur])
                 if tx.fee > 0:
-                    w.writerow([d, "Stripe Fee Expense", tx.fee, "0", "Payment processing fee", tx.customer_email or ""])
-                    w.writerow([d, "Stripe Clearing", "0", tx.fee, "Payment processing fee", tx.customer_email or ""])
+                    w.writerow([d, "Stripe Fee Expense", tx.fee, "0", "Payment processing fee", tx.customer_email or "", cur])
+                    w.writerow([d, "Stripe Clearing", "0", tx.fee, "Payment processing fee", tx.customer_email or "", cur])
             elif tx.tx_type == StripeTxType.REFUND:
-                w.writerow([d, "Sales Income", abs(tx.gross_amount), "0", f"Refund: {tx.description[:80]}", tx.customer_email or ""])
-                w.writerow([d, "Stripe Clearing", "0", abs(tx.gross_amount), f"Refund: {tx.description[:80]}", tx.customer_email or ""])
+                w.writerow([d, "Sales Income", abs(tx.gross_amount), "0", f"Refund: {tx.description[:80]}", tx.customer_email or "", cur])
+                w.writerow([d, "Stripe Clearing", "0", abs(tx.gross_amount), f"Refund: {tx.description[:80]}", tx.customer_email or "", cur])
         return out.getvalue()
 
     def to_combined(self) -> str:
         """Bank + fee entries in one sheet"""
         out = StringIO()
         w = csv.writer(out)
-        w.writerow(["Date", "Description", "Amount", "Memo", "Type"])
+        w.writerow(["Date", "Description", "Amount", "Memo", "Type", "Currency"])
         for tx in self._iter_bank_entries():
-            w.writerow([tx["Date"], tx["Description"], tx["Amount"], tx["Memo"], "Bank"])
+            w.writerow([tx["Date"], tx["Description"], tx["Amount"], tx["Memo"], "Bank", tx.get("Currency", "USD")])
         for fee_tx in self._iter_fee_entries():
-            w.writerow([fee_tx["Date"], fee_tx["Description"], fee_tx["Amount"], fee_tx["Memo"], "Fee"])
+            w.writerow([fee_tx["Date"], fee_tx["Description"], fee_tx["Amount"], fee_tx["Memo"], "Fee", fee_tx.get("Currency", "USD")])
         return out.getvalue()
 
     def _iter_bank_entries(self):
         for tx in self.transactions:
             d = self._fmt_date(tx.date)
+            cur = tx.currency.upper() if tx.currency else "USD"
             if tx.tx_type == StripeTxType.CHARGE:
                 yield {
                     "Date": d,
                     "Description": f"Stripe: {tx.description[:80]}" if tx.description else "Stripe payment",
                     "Amount": tx.net_amount,
                     "Memo": f"Charge {tx.stripe_id or ''} | {tx.customer_email or ''}",
+                    "Currency": cur,
                 }
             elif tx.tx_type == StripeTxType.PAYOUT:
                 yield {
@@ -125,6 +132,7 @@ class QBOTransformer:
                     "Description": f"Stripe payout: {tx.description[:80]}" if tx.description else "Stripe payout to bank",
                     "Amount": tx.net_amount,
                     "Memo": f"Payout {tx.stripe_id or ''}",
+                    "Currency": cur,
                 }
             elif tx.tx_type == StripeTxType.REFUND:
                 yield {
@@ -132,6 +140,7 @@ class QBOTransformer:
                     "Description": f"Refund: {tx.description[:80]}" if tx.description else "Stripe refund",
                     "Amount": tx.net_amount,
                     "Memo": f"Refund {tx.stripe_id or ''}",
+                    "Currency": cur,
                 }
             elif tx.tx_type == StripeTxType.ADJUSTMENT:
                 yield {
@@ -139,6 +148,7 @@ class QBOTransformer:
                     "Description": f"Adjustment: {tx.description[:80]}" if tx.description else "Stripe adjustment",
                     "Amount": tx.gross_amount,
                     "Memo": f"Adj {tx.stripe_id or ''}",
+                    "Currency": cur,
                 }
 
     def _iter_fee_entries(self):
@@ -151,6 +161,7 @@ class QBOTransformer:
                     "Description": "Stripe processing fee",
                     "Amount": fee_sign * tx.fee,
                     "Memo": f"Fee for {tx.stripe_id or ''}",
+                    "Currency": tx.currency.upper() if tx.currency else "USD",
                 }
 
     def summary(self) -> dict:

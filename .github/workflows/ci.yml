@@ -9,4 +9,13 @@ jobs:
         with:
           python-version: "3.10"
       - run: pip install -r requirements.txt
-      - run: python -c "import core.parser; import core.transformer; print('Imports OK')"
+      - run: python -c "
+import core.parser;
+import core.transformer;
+import core.models;
+print('All imports OK')"
+      - run: python -c "
+from core.models import StripeTransaction, StripeTxType;
+from decimal import Decimal;
+t = StripeTransaction(date='2024-01-01', tx_type=StripeTxType.CHARGE, gross_amount=Decimal('100'), fee=Decimal('2.9'), net_amount=Decimal('97.1'), currency='usd', description='Test');
+print(f'Model OK: {t.gross_amount}')"
